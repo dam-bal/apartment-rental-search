@@ -3,8 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\Apartment;
+use Core\Elasticsearch\ApartmentDocumentFactory;
 use Core\Elasticsearch\ApartmentsIndex;
+use Eloquentity\Eloquentity;
 use Illuminate\Console\Command;
+use Core\Entity\Apartment as ApartmentEntity;
 
 class IngestApartmentsToElasticsearchIndex extends Command
 {
@@ -25,24 +28,24 @@ class IngestApartmentsToElasticsearchIndex extends Command
     /**
      * Execute the console command.
      */
-    public function handle(ApartmentsIndex $apartmentsIndex)
-    {
-        Apartment::query()->chunk(100, function ($apartments) use ($apartmentsIndex) {
+    public function handle(
+        ApartmentsIndex $apartmentsIndex,
+        Eloquentity $eloquentity,
+        ApartmentDocumentFactory $apartmentDocumentFactory
+    ) {
+        Apartment::query()->chunk(100, function ($apartments) use (
+            $apartmentsIndex,
+            $eloquentity,
+            $apartmentDocumentFactory
+        ) {
             foreach ($apartments as $apartment) {
+                $apartmentEntity = $eloquentity->map($apartment, ApartmentEntity::class);
+
+                $apartmentDocument = $apartmentDocumentFactory->createFromEntity($apartmentEntity);
+
                 $apartmentsIndex->index(
                     $apartment->id,
-                    [
-                        'id' => $apartment->id,
-                        'name' => $apartment->name,
-                        'bedrooms' => $apartment->bedrooms,
-                        'bathrooms' => $apartment->bathrooms,
-                        'guests' => $apartment->guests,
-                        'petsAllowed' => (bool)$apartment->pets_allowed,
-                        'location' => [
-                            'lat' => $apartment->location_lat,
-                            'lon' => $apartment->location_lon,
-                        ]
-                    ]
+                    $apartmentDocument->jsonSerialize()
                 );
             }
         });
