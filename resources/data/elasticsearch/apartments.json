@@ -1,0 +1,27 @@
+{
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "name": {
+                "type": "text"
+            },
+            "bedrooms": {
+                "type": "short"
+            },
+            "bathrooms": {
+                "type": "short"
+            },
+            "guests": {
+                "type": "short"
+            },
+            "petsAllowed": {
+                "type": "boolean"
+            },
+            "location": {
+                "type": "geo_point"
+            }
+        }
+    }
+}
