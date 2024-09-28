@@ -29,6 +29,10 @@ class ElasticsearchProvider extends ServiceProvider
            return new ApartmentSearch(
                new Builder($this->app->make(Client::class)),
                [
+                   'id' => [
+                       'field' => 'id',
+                       'type' => ApartmentFilterType::MATCH,
+                   ],
                    'bathrooms' => [
                        'field' => 'bathrooms',
                        'type' => ApartmentFilterType::RANGE_MIN,

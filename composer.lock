@@ -203,16 +203,16 @@
         },
         {
             "name": "dam-bal/eloquentity",
-            "version": "0.5.2",
+            "version": "0.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dam-bal/eloquentity.git",
-                "reference": "ff3169b2aa0c1df27ca4c14f479356c8c1d386c9"
+                "reference": "0f84ab9204b0b5d9306bef28e40839115d8f96e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dam-bal/eloquentity/zipball/ff3169b2aa0c1df27ca4c14f479356c8c1d386c9",
-                "reference": "ff3169b2aa0c1df27ca4c14f479356c8c1d386c9",
+                "url": "https://api.github.com/repos/dam-bal/eloquentity/zipball/0f84ab9204b0b5d9306bef28e40839115d8f96e1",
+                "reference": "0f84ab9204b0b5d9306bef28e40839115d8f96e1",
                 "shasum": ""
             },
             "require": {
@@ -249,9 +249,9 @@
             "description": "Eloquent entities (mapping, persisting)",
             "support": {
                 "issues": "https://github.com/dam-bal/eloquentity/issues",
-                "source": "https://github.com/dam-bal/eloquentity/tree/0.5.2"
+                "source": "https://github.com/dam-bal/eloquentity/tree/0.5.3"
             },
-            "time": "2024-03-20T21:19:56+00:00"
+            "time": "2024-09-28T16:09:13+00:00"
         },
         {
             "name": "dflydev/dot-access-data",

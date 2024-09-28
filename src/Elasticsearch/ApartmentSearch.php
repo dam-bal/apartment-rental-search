@@ -11,7 +11,7 @@ use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 
 readonly class ApartmentSearch
 {
-    private const PAGE = 1;
+    private const PAGE = 0;
     private const PER_PAGE = 12;
 
     public function __construct(

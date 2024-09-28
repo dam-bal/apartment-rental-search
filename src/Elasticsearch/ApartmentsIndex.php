@@ -4,7 +4,7 @@ namespace Core\Elasticsearch;
 
 use Elastic\Elasticsearch\Client;
 
-final class ApartmentsIndex extends Index
+class ApartmentsIndex extends Index
 {
     private const INDEX_NAME = 'apartments';
 

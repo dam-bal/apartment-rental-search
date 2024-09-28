@@ -9,4 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 class Apartment extends Model
 {
     use HasFactory, HasUlids;
+
+    protected $fillable = [
+        'name',
+        'bathrooms',
+        'bedrooms',
+        'guests',
+        'petsAllowed'
+    ];
 }
