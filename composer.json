@@ -9,6 +9,7 @@
         "dam-bal/elasticsearch-query-builder": "^1.0",
         "dam-bal/eloquentity": "^0.5.2",
         "elasticsearch/elasticsearch": "^8.15",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
