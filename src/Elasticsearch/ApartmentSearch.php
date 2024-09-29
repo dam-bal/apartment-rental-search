@@ -11,7 +11,7 @@ use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 
 readonly class ApartmentSearch
 {
-    private const PAGE = 0;
+    private const PAGE = 1;
     private const PER_PAGE = 12;
 
     public function __construct(
@@ -22,7 +22,7 @@ readonly class ApartmentSearch
 
     public function search(array $parameters): Elasticsearch
     {
-        $page = $parameters['page'] ?? self::PAGE;
+        $page = max(($parameters['page'] ?? self::PAGE) - 1, 0);
         $perPage = $parameters['perPage'] ?? self::PER_PAGE;
 
         $query = new BoolQuery();
@@ -37,10 +37,13 @@ readonly class ApartmentSearch
             $this->process($query, $config, $value);
         }
 
+        if (!empty($query->toArray()['bool'])) {
+            $this->builder->addQuery($query);
+        }
+
         return $this->builder
             ->from($page * $perPage)
             ->size($perPage)
-            ->addQuery($query)
             ->search();
     }
 
