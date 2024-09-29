@@ -8,15 +8,18 @@ use Spatie\ElasticsearchQueryBuilder\Builder;
 use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
+use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
 
 readonly class ApartmentSearch
 {
     private const PAGE = 1;
     private const PER_PAGE = 12;
+    private const SORT_DEFAULT_ORDER = Sort::ASC;
 
     public function __construct(
         private Builder $builder,
-        private array $config
+        private array $config,
+        private array $sortConfig = []
     ) {
     }
 
@@ -24,6 +27,7 @@ readonly class ApartmentSearch
     {
         $page = max(($parameters['page'] ?? self::PAGE) - 1, 0);
         $perPage = $parameters['perPage'] ?? self::PER_PAGE;
+        $sort = $parameters['sort'] ?? null;
 
         $query = new BoolQuery();
 
@@ -41,10 +45,37 @@ readonly class ApartmentSearch
             $this->builder->addQuery($query);
         }
 
+        if ($sort) {
+            $this->processSort($sort);
+        }
+
         return $this->builder
             ->from($page * $perPage)
             ->size($perPage)
             ->search();
+    }
+
+    private function processSort(string $sort): void
+    {
+        $sortOptions = explode(',', $sort);
+
+        foreach ($sortOptions as $sortOption) {
+            $sortData = explode(':', $sortOption);
+
+            $key = $sortData[0];
+
+            $config = $this->sortConfig[$key] ?? null;
+
+            $order = $sortData[1] ?? $config['order'] ?? self::SORT_DEFAULT_ORDER;
+
+            if (!$config) {
+                return;
+            }
+
+            $field = $config['field'];
+
+            $this->builder->addSort(Sort::create($field, $order));
+        }
     }
 
     private function process(BoolQuery $query, array $config, mixed $value): void

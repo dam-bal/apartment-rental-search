@@ -12,6 +12,7 @@ use Spatie\ElasticsearchQueryBuilder\Builder;
 use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
+use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
 
 class ApartmentSearchTest extends TestCase
 {
@@ -127,6 +128,47 @@ class ApartmentSearchTest extends TestCase
             ->willReturn($this->createMock(Elasticsearch::class));
 
         $sut->search($parameters);
+    }
+
+    public function testSearchSetsSort(): void
+    {
+        $sut = new ApartmentSearch(
+            $this->builderMock,
+            [],
+            [
+                'sort1' => [
+                    'field' => 'sort1_field',
+                ],
+                'sort2' => [
+                    'field' => 'sort2_field',
+                ]
+            ]
+        );
+
+        $this->builderMock
+            ->method('size')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('from')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('addQuery')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->expects($this->once())
+            ->method('addSort')
+            ->with(
+                Sort::create('sort1_field', 'asc'),
+            );
+
+        $this->builderMock
+            ->method('search')
+            ->willReturn($this->createMock(Elasticsearch::class));
+
+        $sut->search(['sort' => 'sort1:asc']);
     }
 
     public function testSearchThrowsExceptionWhenParameterConfigDoesNotHaveType(): void
