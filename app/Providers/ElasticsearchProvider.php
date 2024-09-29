@@ -26,31 +26,49 @@ class ElasticsearchProvider extends ServiceProvider
         });
 
         $this->app->bind(ApartmentSearch::class, function () {
-           return new ApartmentSearch(
-               new Builder($this->app->make(Client::class)),
-               [
-                   'id' => [
-                       'field' => 'id',
-                       'type' => ApartmentFilterType::MATCH,
-                   ],
-                   'bathrooms' => [
-                       'field' => 'bathrooms',
-                       'type' => ApartmentFilterType::RANGE_MIN,
-                   ],
-                   'bedrooms' => [
-                       'field' => 'bedrooms',
-                       'type' => ApartmentFilterType::RANGE_MIN,
-                   ],
-                   'guests' => [
-                       'field' => 'guests',
-                       'type' => ApartmentFilterType::RANGE_MIN,
-                   ],
-                   'petsAllowed' => [
-                       'field' => 'petsAllowed',
-                       'type' => ApartmentFilterType::MATCH,
-                   ],
-               ]
-           );
+            return new ApartmentSearch(
+                new Builder($this->app->make(Client::class)),
+                [
+                    'id' => [
+                        'field' => 'id',
+                        'type' => ApartmentFilterType::MATCH,
+                    ],
+                    'bathrooms' => [
+                        'field' => 'bathrooms',
+                        'type' => ApartmentFilterType::RANGE_MIN,
+                    ],
+                    'bedrooms' => [
+                        'field' => 'bedrooms',
+                        'type' => ApartmentFilterType::RANGE_MIN,
+                    ],
+                    'guests' => [
+                        'field' => 'guests',
+                        'type' => ApartmentFilterType::RANGE_MIN,
+                    ],
+                    'petsAllowed' => [
+                        'field' => 'petsAllowed',
+                        'type' => ApartmentFilterType::MATCH,
+                    ],
+                ],
+                [
+                    'bedrooms' => [
+                        'field' => 'bedrooms',
+                        'order' => 'desc',
+                    ],
+                    'bathrooms' => [
+                        'field' => 'bathrooms',
+                        'order' => 'desc',
+                    ],
+                    'guests' => [
+                        'field' => 'guests',
+                        'order' => 'desc',
+                    ],
+                    'petsAllowed' => [
+                        'field' => 'petsAllowed',
+                        'order' => 'desc',
+                    ]
+                ]
+            );
         });
     }
 
