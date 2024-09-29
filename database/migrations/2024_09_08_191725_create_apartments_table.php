@@ -20,6 +20,8 @@ return new class extends Migration
             $table->boolean('pets_allowed');
             $table->float('location_lat');
             $table->float('location_lon');
+            $table->text('description');
+            $table->float('base_price_per_night');
             $table->timestamps();
         });
     }

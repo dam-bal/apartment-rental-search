@@ -24,6 +24,8 @@ class ApartmentFactory extends Factory
             'pets_allowed' => (bool)$this->faker->numberBetween(0, 1),
             'location_lat' => $this->faker->latitude(),
             'location_lon' => $this->faker->longitude(),
+            'description' => $this->faker->text(),
+            'base_price_per_night' => $this->faker->randomFloat(min: 30, max: 300),
         ];
     }
 }

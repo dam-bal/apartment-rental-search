@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Apartment;
+use App\Models\Occupancy;
+use App\Models\PriceModifier;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,6 +15,10 @@ class ApartmentSeeder extends Seeder
      */
     public function run(): void
     {
-        Apartment::factory()->count(600)->create();
+        Apartment::factory()
+            ->has(PriceModifier::factory()->count(3))
+            ->has(Occupancy::factory()->count(3))
+            ->count(600)
+            ->create();
     }
 }
