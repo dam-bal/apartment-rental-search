@@ -60,7 +60,7 @@ class ApartmentSearchTest extends TestCase
         $this->builderMock
             ->expects($this->once())
             ->method('from')
-            ->with(20)
+            ->with(10)
             ->willReturnSelf();
 
         $this->builderMock
