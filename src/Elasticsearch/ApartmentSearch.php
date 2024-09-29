@@ -30,7 +30,7 @@ readonly class ApartmentSearch
         foreach ($parameters as $param => $value) {
             $config = $this->config[$param] ?? null;
 
-            if (!$config) {
+            if (!$config || empty($value)) {
                 continue;
             }
 
