@@ -2,6 +2,9 @@
 
 namespace Core\Entity;
 
+use Core\Enum\PriceModifierType;
+use DateTime;
+
 class Apartment
 {
     /**
@@ -18,6 +21,7 @@ class Apartment
         private float $locationLat,
         private float $locationLon,
         private string $description,
+        private float $basePricePerNight,
         private array $occupancies,
         private array $priceModifiers
     ) {
@@ -82,5 +86,45 @@ class Apartment
     public function getOccupancies(): array
     {
         return $this->occupancies;
+    }
+
+    public function getPrice(DateTime $from, DateTime $to): float
+    {
+        $nights = $to->diff($from)->days;
+
+        $prices = [];
+
+        for ($i = 0; $i < $nights; $i++) {
+            $date = $from->modify(sprintf('%s days', $i));
+            $dateString = $date->format('Y-m-d');
+
+            $prices[$dateString] = $this->basePricePerNight;
+
+            foreach ($this->priceModifiers as $priceModifier) {
+                if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
+                    $value = 0.0;
+
+                    if ($priceModifier->getType() === PriceModifierType::AMOUNT) {
+                        $value = $priceModifier->getValue();
+                    }
+
+                    if ($priceModifier->getType() === PriceModifierType::PERCENTAGE) {
+                        $modifier = $priceModifier->getValue() / 100;
+
+                        $value = $prices[$dateString] * $modifier;
+                    }
+
+                    $prices[$dateString] += $value;
+                }
+            }
+        }
+
+        $total = 0;
+
+        foreach ($prices as $price) {
+            $total += $price;
+        }
+
+        return $total;
     }
 }
