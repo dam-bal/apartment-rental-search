@@ -13,6 +13,7 @@ use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\NestedQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
+use Spatie\ElasticsearchQueryBuilder\Sorts\NestedSort;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
 
 class ApartmentSearchTest extends TestCase
@@ -258,6 +259,52 @@ class ApartmentSearchTest extends TestCase
 
         $sut->search(['sort' => 'sort1:asc']);
     }
+
+    public function testSearchSetsNestedSort(): void
+    {
+        $sut = new ApartmentSearch(
+            $this->builderMock,
+            [],
+            [
+                'sort1' => [
+                    'field' => 'sort1_field',
+                    'nested' => [
+                        'path' => 'test',
+                    ]
+                ],
+            ]
+        );
+
+        $this->builderMock
+            ->method('size')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('from')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('addQuery')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->expects($this->once())
+            ->method('addSort')
+            ->with(
+                NestedSort::create('test', 'sort1_field', 'asc')->maxChildren(1),
+            );
+
+        $this->builderMock
+            ->method('fields')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('search')
+            ->willReturn($this->createMock(Elasticsearch::class));
+
+        $sut->search(['sort' => 'sort1:asc']);
+    }
+
 
     public function testSearchThrowsExceptionWhenParameterConfigDoesNotHaveType(): void
     {

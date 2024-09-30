@@ -9,9 +9,10 @@ use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\NestedQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
+use Spatie\ElasticsearchQueryBuilder\Sorts\NestedSort;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
 
-readonly class ApartmentSearch
+class ApartmentSearch
 {
     private const PAGE = 1;
     private const PER_PAGE = 12;
@@ -25,10 +26,13 @@ readonly class ApartmentSearch
         'name',
     ];
 
+    /** @var array<string, BoolQuery> */
+    private array $nestedFilters;
+
     public function __construct(
-        private Builder $builder,
-        private array $config,
-        private array $sortConfig = []
+        private readonly Builder $builder,
+        private readonly array $config,
+        private readonly array $sortConfig = []
     ) {
     }
 
@@ -42,7 +46,7 @@ readonly class ApartmentSearch
 
         $fields = self::FIELDS;
 
-        $nestedFilters = [];
+        $this->nestedFilters = [];
 
         foreach ($parameters as $param => $value) {
             $config = $this->config[$param] ?? null;
@@ -52,12 +56,12 @@ readonly class ApartmentSearch
             }
 
             if ($config['nested'] ?? null) {
-                $nestedFilter = $nestedFilters[$config['nested']['group']] ?? null;
+                $nestedFilter = $this->nestedFilters[$config['nested']['group']] ?? null;
 
                 if (!$nestedFilter) {
                     $nestedFilter = new BoolQuery();
 
-                    $nestedFilters[$config['nested']['group']] = $nestedFilter;
+                    $this->nestedFilters[$config['nested']['group']] = $nestedFilter;
 
                     $nestedQuery = new NestedQuery($config['nested']['path'], $nestedFilter);
 
@@ -108,7 +112,25 @@ readonly class ApartmentSearch
 
             $field = $config['field'];
 
-            $this->builder->addSort(Sort::create($field, $order));
+            $isNested = $config['nested'] ?? null;
+
+            if ($isNested) {
+                $nestedSort = NestedSort::create($config['nested']['path'], $field, $order);
+
+                $nestedSort->maxChildren(1);
+
+                if ($config['nested']['group'] ?? null) {
+                    $nestedSort->filter($this->nestedFilters[$config['nested']['group']]);
+                }
+
+                if ($config['nested']['mode'] ?? null) {
+                    $nestedSort->mode($config['nested']['mode']);
+                }
+
+                $this->builder->addSort($nestedSort);
+            } else {
+                $this->builder->addSort(Sort::create($field, $order));
+            }
         }
     }
 

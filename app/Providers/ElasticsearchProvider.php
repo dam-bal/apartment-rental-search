@@ -90,7 +90,15 @@ class ElasticsearchProvider extends ServiceProvider
                     'petsAllowed' => [
                         'field' => 'petsAllowed',
                         'order' => 'desc',
-                    ]
+                    ],
+                    'price' => [
+                        'field' => 'prices.price',
+                        'nested' => [
+                            'path' => 'prices',
+                            'group' => 'pricing',
+                            'mode' => 'min',
+                        ],
+                    ],
                 ]
             );
         });
