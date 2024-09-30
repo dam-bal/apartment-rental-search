@@ -119,7 +119,7 @@ class ApartmentSearch
 
                 $nestedSort->maxChildren(1);
 
-                if ($config['nested']['group'] ?? null) {
+                if (($config['nested']['group'] ?? null) && $this->nestedFilters[$config['nested']['group']] ?? null) {
                     $nestedSort->filter($this->nestedFilters[$config['nested']['group']]);
                 }
 

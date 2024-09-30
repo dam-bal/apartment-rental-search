@@ -73,7 +73,7 @@ class ApartmentController extends Controller
         foreach ($result['hits']['hits'] as $hit) {
             $resultItem = $hit['_source'];
 
-            foreach ($hit['inner_hits'] as $key => $innerHit) {
+            foreach ($hit['inner_hits'] ?? [] as $key => $innerHit) {
                 $innerHits = $innerHit['hits']['hits'];
 
                 if (count($innerHits)) {
