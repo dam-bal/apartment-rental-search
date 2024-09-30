@@ -4,6 +4,10 @@ namespace Core\Entity;
 
 class Apartment
 {
+    /**
+     * @param Occupancy[] $occupancies
+     * @param PriceModifier[] $priceModifiers
+     */
     public function __construct(
         private string $id,
         private string $name,
@@ -12,7 +16,10 @@ class Apartment
         private int $guests,
         private bool $petsAllowed,
         private float $locationLat,
-        private float $locationLon
+        private float $locationLon,
+        private string $description,
+        private array $occupancies,
+        private array $priceModifiers
     ) {
     }
 
@@ -54,5 +61,26 @@ class Apartment
     public function getLocationLon(): float
     {
         return $this->locationLon;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return PriceModifier[]
+     */
+    public function getPriceModifiers(): array
+    {
+        return $this->priceModifiers;
+    }
+
+    /**
+     * @return Occupancy[]
+     */
+    public function getOccupancies(): array
+    {
+        return $this->occupancies;
     }
 }

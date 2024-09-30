@@ -14,4 +14,12 @@ class Occupancy extends Model
     {
         return $this->belongsTo(Apartment::class);
     }
+
+    protected function casts(): array
+    {
+        return [
+            'from' => 'datetime:Y-m-d H:i:s',
+            'to' => 'datetime:Y-m-d H:i:s'
+        ];
+    }
 }
