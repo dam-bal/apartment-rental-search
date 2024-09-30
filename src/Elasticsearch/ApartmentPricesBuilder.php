@@ -4,6 +4,7 @@ namespace Core\Elasticsearch;
 
 use Carbon\Carbon;
 use Core\Entity\Apartment;
+use Core\Entity\Occupancy;
 
 class ApartmentPricesBuilder
 {
@@ -30,8 +31,12 @@ class ApartmentPricesBuilder
 
         while ($current < $endStart) {
             for ($i = $this->minNights; $i <= $this->maxNights; $i++) {
-                $start = (clone $current)->setTime(0, 0);
-                $end = (clone $current)->setTime(0, 0)->addDays($i);
+                $start = (clone $current)->setTime(14, 0);
+                $end = (clone $current)->setTime(12, 0)->addDays($i);
+
+                if ($this->isOccupied($apartment->getOccupancies(), $start, $end)) {
+                    continue;
+                }
 
                 $price = $apartment->getPrice($start, $end);
 
@@ -58,5 +63,27 @@ class ApartmentPricesBuilder
         }
 
         return array_values($prices);
+    }
+
+    /**
+     * @param Occupancy[] $occupancies
+     */
+    private function isOccupied(array $occupancies, Carbon $start, Carbon $end): bool
+    {
+        foreach ($occupancies as $occupancy) {
+            $from = Carbon::instance($occupancy->from)->setTime(14, 0);
+            $to = Carbon::instance($occupancy->to)->setTime(12, 0);
+
+            if ($this->isOverlapping($from, $to, $start, $end)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isOverlapping(Carbon $start1, Carbon $end1, Carbon $start2, Carbon $end2): bool
+    {
+        return ($start1 <= $end2) && ($start2 <= $end1);
     }
 }

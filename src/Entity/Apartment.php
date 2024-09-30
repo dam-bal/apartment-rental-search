@@ -74,6 +74,14 @@ class Apartment
         return $this->description;
     }
 
+    /**
+     * @return Occupancy[]
+     */
+    public function getOccupancies(): array
+    {
+        return $this->occupancies;
+    }
+
     public function getPrice(Carbon $from, Carbon $to): ApartmentPrice
     {
         $nights = $to->setTime(0, 0)->diffInDays($from->setTime(0, 0), true);

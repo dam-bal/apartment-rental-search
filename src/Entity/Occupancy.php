@@ -2,11 +2,13 @@
 
 namespace Core\Entity;
 
-class Occupancy
+use DateTime;
+
+readonly class Occupancy
 {
     public function __construct(
-        private readonly \DateTime $from,
-        private readonly \DateTime $to,
+        public DateTime $from,
+        public DateTime $to,
     ) {
     }
 }
