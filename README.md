@@ -35,3 +35,7 @@ docker run --rm \
 ```shell
 ./vendor/bin/sail queue:work
 ```
+
+## Kibana
+
+Local kibana can be accessed [here](http://localhost:5601/)
