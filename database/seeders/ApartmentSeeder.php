@@ -18,7 +18,7 @@ class ApartmentSeeder extends Seeder
         Apartment::factory()
             ->has(PriceModifier::factory()->count(3))
             ->has(Occupancy::factory()->count(3))
-            ->count(600)
+            ->count(500)
             ->create();
     }
 }

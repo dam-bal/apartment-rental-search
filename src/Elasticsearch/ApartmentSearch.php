@@ -15,6 +15,14 @@ readonly class ApartmentSearch
     private const PAGE = 1;
     private const PER_PAGE = 12;
     private const SORT_DEFAULT_ORDER = Sort::ASC;
+    private const FIELDS = [
+        'bedrooms',
+        'bathrooms',
+        'guests',
+        'petsAllowed',
+        'id',
+        'name',
+    ];
 
     public function __construct(
         private Builder $builder,
@@ -31,6 +39,8 @@ readonly class ApartmentSearch
 
         $query = new BoolQuery();
 
+        $fields = self::FIELDS;
+
         foreach ($parameters as $param => $value) {
             $config = $this->config[$param] ?? null;
 
@@ -39,6 +49,8 @@ readonly class ApartmentSearch
             }
 
             $this->process($query, $config, $value);
+
+            $fields = array_merge($fields, $config['fields'] ?? []);
         }
 
         if (!empty($query->toArray()['bool'])) {
@@ -52,6 +64,7 @@ readonly class ApartmentSearch
         return $this->builder
             ->from($page * $perPage)
             ->size($perPage)
+            ->fields(array_values(array_unique($fields)))
             ->search();
     }
 

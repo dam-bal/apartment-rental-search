@@ -43,6 +43,10 @@ class ApartmentSearchTest extends TestCase
             ->willReturnSelf();
 
         $this->builderMock
+            ->method('fields')
+            ->willReturnSelf();
+
+        $this->builderMock
             ->method('search')
             ->willReturn($this->createMock(Elasticsearch::class));
 
@@ -66,6 +70,10 @@ class ApartmentSearchTest extends TestCase
 
         $this->builderMock
             ->method('addQuery')
+            ->willReturnSelf();
+
+        $this->builderMock
+            ->method('fields')
             ->willReturnSelf();
 
         $this->builderMock
@@ -124,6 +132,10 @@ class ApartmentSearchTest extends TestCase
             ->willReturnSelf();
 
         $this->builderMock
+            ->method('fields')
+            ->willReturnSelf();
+
+        $this->builderMock
             ->method('search')
             ->willReturn($this->createMock(Elasticsearch::class));
 
@@ -163,6 +175,10 @@ class ApartmentSearchTest extends TestCase
             ->with(
                 Sort::create('sort1_field', 'asc'),
             );
+
+        $this->builderMock
+            ->method('fields')
+            ->willReturnSelf();
 
         $this->builderMock
             ->method('search')

@@ -16,14 +16,14 @@ class PriceModifierFactory extends Factory
      */
     public function definition(): array
     {
-        $from = $this->faker->dateTimeBetween('+1 weeks', '+2 months');
-        $to = (clone $from)->modify(sprintf('+%s days', $this->faker->numberBetween(2, 7)));
+        $from = $this->faker->dateTimeBetween('+5 days', '+2 months');
+        $to = (clone $from)->modify(sprintf('+%s days', $this->faker->numberBetween(2, 8)));
 
         return [
             'from' => $from->setTime(0, 0),
             'to' => $to->setTime(0, 0),
             'type' => $this->faker->randomElement(['amount', 'percentage']),
-            'value' => $this->faker->numberBetween(-15, 15),
+            'value' => $this->faker->numberBetween(-10, 10),
         ];
     }
 }

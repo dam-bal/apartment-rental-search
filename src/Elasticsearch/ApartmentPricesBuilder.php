@@ -7,9 +7,9 @@ use Core\Entity\Apartment;
 
 class ApartmentPricesBuilder
 {
-    private const DAYS = 3;
+    private const DAYS = 40;
     private const MIN_NIGHTS = 1;
-    private const MAX_NIGHTS = 4;
+    private const MAX_NIGHTS = 7;
 
     public function __construct(
         private readonly int $maxDays = self::DAYS,
