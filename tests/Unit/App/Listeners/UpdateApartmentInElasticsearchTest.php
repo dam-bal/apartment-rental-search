@@ -53,13 +53,11 @@ class UpdateApartmentInElasticsearchTest extends TestCase
 
         $apartmentsIndexMock
             ->expects($this->once())
-            ->method('update')
+            ->method('index')
             ->with(
                 'id',
                 [
-                    'doc' => [
-                        'name' => 'test',
-                    ]
+                    'name' => 'test',
                 ]
             );
 

@@ -2,11 +2,13 @@
 
 namespace Core\Entity;
 
+use Carbon\Carbon;
 use Core\Enum\PriceModifierType;
-use DateTime;
 
 class Apartment
 {
+    private const LOWEST_PRICE = 15.0;
+
     /**
      * @param Occupancy[] $occupancies
      * @param PriceModifier[] $priceModifiers
@@ -80,71 +82,48 @@ class Apartment
         return $this->occupancies;
     }
 
-    public function getBasePrice(DateTime $from, DateTime $to): float
+    public function getPrice(Carbon $from, Carbon $to): ApartmentPrice
     {
-        $nights = $to->diff($from)->days;
+        $nights = $to->setTime(0, 0)->diffInDays($from->setTime(0, 0), true);
 
         $prices = [];
+        $basePrices = [];
 
         for ($i = 0; $i < $nights; $i++) {
-            $date = $from->modify(sprintf('%s days', $i));
+            $date = (clone $from)->addDays($i)->setTime(0, 0);
             $dateString = $date->format('Y-m-d');
 
             $prices[$dateString] = $this->basePricePerNight;
+            $basePrices[$dateString] = $this->basePricePerNight;
 
             foreach ($this->priceModifiers as $priceModifier) {
-                if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
+                if ($date >= $priceModifier->getFrom()->setTime(0, 0)
+                    && $date <= $priceModifier->getTo()->setTime(0, 0)
+                ) {
                     $value = match ($priceModifier->getType()) {
                         PriceModifierType::AMOUNT => $priceModifier->getValue(),
-                        PriceModifierType::PERCENTAGE => $prices[$dateString] * ($priceModifier->getValue() / 100),
+                        PriceModifierType::PERCENTAGE => $this->basePricePerNight * ($priceModifier->getValue() / 100),
                     };
 
+                    $prices[$dateString] += $value;
+
                     if ($value > 0) {
-                        $prices[$dateString] += $value;
+                        $basePrices[$dateString] += $value;
                     }
                 }
             }
         }
 
-        $total = 0;
-
+        $priceTotal = 0;
         foreach ($prices as $price) {
-            $total += $price;
+            $priceTotal += $price;
         }
 
-        return $total;
-    }
-
-    public function getPrice(DateTime $from, DateTime $to): float
-    {
-        $nights = $to->diff($from)->days;
-
-        $prices = [];
-
-        for ($i = 0; $i < $nights; $i++) {
-            $date = $from->modify(sprintf('%s days', $i));
-            $dateString = $date->format('Y-m-d');
-
-            $prices[$dateString] = $this->basePricePerNight;
-
-            foreach ($this->priceModifiers as $priceModifier) {
-                if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
-                    $value = match ($priceModifier->getType()) {
-                        PriceModifierType::AMOUNT => $priceModifier->getValue(),
-                        PriceModifierType::PERCENTAGE => $prices[$dateString] * ($priceModifier->getValue() / 100),
-                    };
-
-                    $prices[$dateString] += $value;
-                }
-            }
+        $basePriceTotal = 0;
+        foreach ($basePrices as $price) {
+            $basePriceTotal += $price;
         }
 
-        $total = 0;
-
-        foreach ($prices as $price) {
-            $total += $price;
-        }
-
-        return $total;
+        return new ApartmentPrice($basePriceTotal, max($priceTotal, self::LOWEST_PRICE));
     }
 }

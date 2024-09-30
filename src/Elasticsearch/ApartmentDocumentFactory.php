@@ -6,6 +6,10 @@ use Core\Entity\Apartment;
 
 class ApartmentDocumentFactory
 {
+    public function __construct(private readonly ApartmentPricesBuilder $apartmentPricesBuilder)
+    {
+    }
+
     public function createFromEntity(Apartment $apartment): ApartmentDocument
     {
         return new ApartmentDocument(
@@ -16,7 +20,9 @@ class ApartmentDocumentFactory
             $apartment->getGuests(),
             $apartment->isPetsAllowed(),
             $apartment->getLocationLat(),
-            $apartment->getLocationLon()
+            $apartment->getLocationLon(),
+            $apartment->getDescription(),
+            $this->apartmentPricesBuilder->build($apartment)
         );
     }
 }

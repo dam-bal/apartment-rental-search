@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Events\ApartmentUpdated;
 use App\Models\Apartment;
-use Core\Elasticsearch\ApartmentDocumentFactory;
-use Core\Elasticsearch\ApartmentsIndex;
-use Eloquentity\Eloquentity;
 use Illuminate\Console\Command;
-use Core\Entity\Apartment as ApartmentEntity;
+use Illuminate\Events\Dispatcher;
 
 class IngestApartmentsToElasticsearchIndex extends Command
 {
@@ -28,25 +26,13 @@ class IngestApartmentsToElasticsearchIndex extends Command
     /**
      * Execute the console command.
      */
-    public function handle(
-        ApartmentsIndex $apartmentsIndex,
-        Eloquentity $eloquentity,
-        ApartmentDocumentFactory $apartmentDocumentFactory
-    ) {
-        Apartment::query()->chunk(100, function ($apartments) use (
-            $apartmentsIndex,
-            $eloquentity,
-            $apartmentDocumentFactory
+    public function handle(Dispatcher $eventDispatcher)
+    {
+        Apartment::query()->with(['priceModifiers'])->chunk(50, function ($apartments) use (
+            $eventDispatcher
         ) {
             foreach ($apartments as $apartment) {
-                $apartmentEntity = $eloquentity->map($apartment, ApartmentEntity::class);
-
-                $apartmentDocument = $apartmentDocumentFactory->createFromEntity($apartmentEntity);
-
-                $apartmentsIndex->index(
-                    $apartment->id,
-                    $apartmentDocument->jsonSerialize()
-                );
+                $eventDispatcher->dispatch(new ApartmentUpdated($apartment));
             }
         });
     }

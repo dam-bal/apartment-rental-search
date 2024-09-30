@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\ApartmentUpdated;
 use App\Models\Apartment;
+use Carbon\Carbon;
 use Core\Elasticsearch\ApartmentSearch;
+use Eloquentity\Eloquentity;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 
@@ -12,7 +14,8 @@ class ApartmentController extends Controller
 {
     public function __construct(
         private readonly ApartmentSearch $apartmentSearch,
-        private readonly Dispatcher $eventDispatcher
+        private readonly Dispatcher $eventDispatcher,
+        private readonly Eloquentity $eloquentity
     ) {
     }
 
@@ -28,13 +31,37 @@ class ApartmentController extends Controller
 
     public function update(string $id, Request $request)
     {
-        $apartment = Apartment::query()->findOrFail($id);
+        $apartment = Apartment::query()->with(['priceModifiers'])->findOrFail($id);
 
         $apartment?->update($request->all());
 
         $this->eventDispatcher->dispatch(new ApartmentUpdated($apartment));
 
         return $apartment;
+    }
+
+    public function price(string $id, Request $request)
+    {
+        $from = $request->get('from');
+        $to = $request->get('to');
+
+        $from = Carbon::createFromFormat('Y-m-d', $from);
+        $to = Carbon::createFromFormat('Y-m-d', $to);
+
+        $apartment = Apartment::query()->with(['priceModifiers'])->findOrFail($id);
+
+        $entity = $this->eloquentity->map($apartment, \Core\Entity\Apartment::class);
+
+        $price = $entity->getPrice($from, $to);
+
+        return [
+            'basePricePerNight' => $apartment->base_price_per_night,
+            'from' => $from->format('Y-m-d'),
+            'to' => $to->format('Y-m-d'),
+            'nights' => $to->diffInDays($from, true),
+            'price' => $price->price,
+            'basePrice' => $price->basePrice
+        ];
     }
 
     public function filter(Request $request)

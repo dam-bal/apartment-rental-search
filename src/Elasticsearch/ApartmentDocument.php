@@ -6,6 +6,18 @@ use JsonSerializable;
 
 class ApartmentDocument implements JsonSerializable
 {
+    /**
+     * @param string $id
+     * @param string $name
+     * @param int $bedrooms
+     * @param int $bathrooms
+     * @param int $guests
+     * @param bool $petsAllowed
+     * @param float $locationLat
+     * @param float $locationLon
+     * @param string $description
+     * @param ApartmentPrice[] $prices
+     */
     public function __construct(
         private string $id,
         private string $name,
@@ -14,7 +26,9 @@ class ApartmentDocument implements JsonSerializable
         private int $guests,
         private bool $petsAllowed,
         private float $locationLat,
-        private float $locationLon
+        private float $locationLon,
+        private string $description,
+        private array $prices = []
     ) {
     }
 
@@ -30,7 +44,9 @@ class ApartmentDocument implements JsonSerializable
             'location' => [
                 'lat' => $this->locationLat,
                 'lon' => $this->locationLon,
-            ]
+            ],
+            'description' => $this->description,
+            'prices' => $this->prices,
         ];
     }
 }

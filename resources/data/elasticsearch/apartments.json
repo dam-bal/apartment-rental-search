@@ -21,6 +21,26 @@
             },
             "location": {
                 "type": "geo_point"
+            },
+            "description": {
+                "type": "text"
+            },
+            "prices": {
+                "type": "nested",
+                "properties": {
+                    "startDate": {
+                        "type": "date"
+                    },
+                    "nights": {
+                        "type": "short"
+                    },
+                    "price": {
+                        "type": "float"
+                    },
+                    "basePrice": {
+                        "type": "float"
+                    }
+                }
             }
         }
     }

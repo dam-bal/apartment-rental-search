@@ -32,11 +32,9 @@ class UpdateApartmentInElasticsearch implements ShouldQueue
 
         $document = $this->apartmentDocumentFactory->createFromEntity($entity);
 
-        $this->apartmentsIndex->update(
+        $this->apartmentsIndex->index(
             $entity->getId(),
-            [
-                'doc' => $document->jsonSerialize()
-            ]
+            $document->jsonSerialize()
         );
     }
 }
