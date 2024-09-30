@@ -94,17 +94,10 @@ class Apartment
 
             foreach ($this->priceModifiers as $priceModifier) {
                 if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
-                    $value = 0.0;
-
-                    if ($priceModifier->getType() === PriceModifierType::AMOUNT) {
-                        $value = $priceModifier->getValue();
-                    }
-
-                    if ($priceModifier->getType() === PriceModifierType::PERCENTAGE) {
-                        $modifier = $priceModifier->getValue() / 100;
-
-                        $value = $prices[$dateString] * $modifier;
-                    }
+                    $value = match ($priceModifier->getType()) {
+                        PriceModifierType::AMOUNT => $priceModifier->getValue(),
+                        PriceModifierType::PERCENTAGE => $prices[$dateString] * ($priceModifier->getValue() / 100),
+                    };
 
                     if ($value > 0) {
                         $prices[$dateString] += $value;
@@ -136,17 +129,10 @@ class Apartment
 
             foreach ($this->priceModifiers as $priceModifier) {
                 if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
-                    $value = 0.0;
-
-                    if ($priceModifier->getType() === PriceModifierType::AMOUNT) {
-                        $value = $priceModifier->getValue();
-                    }
-
-                    if ($priceModifier->getType() === PriceModifierType::PERCENTAGE) {
-                        $modifier = $priceModifier->getValue() / 100;
-
-                        $value = $prices[$dateString] * $modifier;
-                    }
+                    $value = match ($priceModifier->getType()) {
+                        PriceModifierType::AMOUNT => $priceModifier->getValue(),
+                        PriceModifierType::PERCENTAGE => $prices[$dateString] * ($priceModifier->getValue() / 100),
+                    };
 
                     $prices[$dateString] += $value;
                 }
