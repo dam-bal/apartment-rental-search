@@ -31,7 +31,7 @@ class ApartmentPricesBuilder
         while ($current < $endStart) {
             for ($i = $this->minNights; $i <= $this->maxNights; $i++) {
                 $start = (clone $current)->setTime(0, 0);
-                $end = (clone $current)->setTime(0,0)->addDays($i);
+                $end = (clone $current)->setTime(0, 0)->addDays($i);
 
                 $price = $apartment->getPrice($start, $end);
 

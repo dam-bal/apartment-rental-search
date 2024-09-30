@@ -30,9 +30,6 @@ class PriceModifier
         return $this->type;
     }
 
-    /**
-     * @return float
-     */
     public function getValue(): float
     {
         return $this->value;

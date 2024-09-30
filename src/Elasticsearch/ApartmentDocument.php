@@ -4,18 +4,9 @@ namespace Core\Elasticsearch;
 
 use JsonSerializable;
 
-class ApartmentDocument implements JsonSerializable
+readonly class ApartmentDocument implements JsonSerializable
 {
     /**
-     * @param string $id
-     * @param string $name
-     * @param int $bedrooms
-     * @param int $bathrooms
-     * @param int $guests
-     * @param bool $petsAllowed
-     * @param float $locationLat
-     * @param float $locationLon
-     * @param string $description
      * @param ApartmentPrice[] $prices
      */
     public function __construct(
