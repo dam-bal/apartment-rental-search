@@ -6,6 +6,7 @@ use Elastic\Elasticsearch\Response\Elasticsearch;
 use InvalidArgumentException;
 use Spatie\ElasticsearchQueryBuilder\Builder;
 use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
+use Spatie\ElasticsearchQueryBuilder\Queries\NestedQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
@@ -41,6 +42,8 @@ readonly class ApartmentSearch
 
         $fields = self::FIELDS;
 
+        $nestedFilters = [];
+
         foreach ($parameters as $param => $value) {
             $config = $this->config[$param] ?? null;
 
@@ -48,7 +51,25 @@ readonly class ApartmentSearch
                 continue;
             }
 
-            $this->process($query, $config, $value);
+            if ($config['nested'] ?? null) {
+                $nestedFilter = $nestedFilters[$config['nested']['group']] ?? null;
+
+                if (!$nestedFilter) {
+                    $nestedFilter = new BoolQuery();
+
+                    $nestedFilters[$config['nested']['group']] = $nestedFilter;
+
+                    $nestedQuery = new NestedQuery($config['nested']['path'], $nestedFilter);
+
+                    $nestedQuery->innerHits(NestedQuery\InnerHits::create($config['nested']['group'])->size(1));
+
+                    $query->add($nestedQuery, 'filter');
+                }
+
+                $this->process($nestedFilter, $config, $value);
+            } else {
+                $this->process($query, $config, $value);
+            }
 
             $fields = array_merge($fields, $config['fields'] ?? []);
         }
@@ -102,6 +123,22 @@ readonly class ApartmentSearch
 
         if ($type === ApartmentFilterType::RANGE_MIN) {
             $query->add(RangeQuery::create($field)->gte($value));
+        }
+
+        if ($type === ApartmentFilterType::RANGE) {
+            $values = explode(',', $value);
+
+            $range = RangeQuery::create($field);
+
+            if ($values[0] !== '') {
+                $range->gte($values[0]);
+            }
+
+            if (isset($values[1]) && $values[1] !== '') {
+                $range->lte($values[1]);
+            }
+
+            $query->add($range);
         }
     }
 }

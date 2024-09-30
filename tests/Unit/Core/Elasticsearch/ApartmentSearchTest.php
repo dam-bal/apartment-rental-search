@@ -10,6 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Spatie\ElasticsearchQueryBuilder\Builder;
 use Spatie\ElasticsearchQueryBuilder\Queries\BoolQuery;
+use Spatie\ElasticsearchQueryBuilder\Queries\NestedQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
@@ -109,6 +110,77 @@ class ApartmentSearchTest extends TestCase
                 'filter' => 123,
             ],
             BoolQuery::create()->add(RangeQuery::create('testField')->gte(123))
+        ];
+
+        yield [
+            [
+                'filter1' => [
+                    'type' => ApartmentFilterType::MATCH,
+                    'field' => 'testField.test1',
+                    'nested' => [
+                        'path' => 'testPath',
+                        'group' => 'testGroup',
+                    ]
+                ],
+                'filter2' => [
+                    'type' => ApartmentFilterType::MATCH,
+                    'field' => 'testField.test2',
+                    'nested' => [
+                        'path' => 'testPath',
+                        'group' => 'testGroup',
+                    ]
+                ]
+            ],
+            [
+                'filter1' => 'test',
+                'filter2' => 'test'
+            ],
+            BoolQuery::create()->add(
+                NestedQuery::create(
+                    'testPath',
+                    BoolQuery::create()->add(TermQuery::create('testField.test1', 'test'))
+                        ->add(TermQuery::create('testField.test2', 'test'))
+                )->innerHits(NestedQuery\InnerHits::create('testGroup')->size(1)),
+                'filter'
+            )
+        ];
+
+        yield [
+            [
+                'filter1' => [
+                    'type' => ApartmentFilterType::MATCH,
+                    'field' => 'testField.test1',
+                    'nested' => [
+                        'path' => 'testPath',
+                        'group' => 'testGroup1',
+                    ]
+                ],
+                'filter2' => [
+                    'type' => ApartmentFilterType::MATCH,
+                    'field' => 'testField.test2',
+                    'nested' => [
+                        'path' => 'testPath',
+                        'group' => 'testGroup2',
+                    ]
+                ]
+            ],
+            [
+                'filter1' => 'test',
+                'filter2' => 'test'
+            ],
+            BoolQuery::create()->add(
+                NestedQuery::create(
+                    'testPath',
+                    BoolQuery::create()->add(TermQuery::create('testField.test1', 'test'))
+                )->innerHits(NestedQuery\InnerHits::create('testGroup1')->size(1)),
+                'filter'
+            )->add(
+                NestedQuery::create(
+                    'testPath',
+                    BoolQuery::create()->add(TermQuery::create('testField.test2', 'test'))
+                )->innerHits(NestedQuery\InnerHits::create('testGroup2')->size(1)),
+                'filter'
+            )
         ];
     }
 

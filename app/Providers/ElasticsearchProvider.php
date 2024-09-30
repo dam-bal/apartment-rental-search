@@ -49,6 +49,30 @@ class ElasticsearchProvider extends ServiceProvider
                         'field' => 'petsAllowed',
                         'type' => ApartmentFilterType::MATCH,
                     ],
+                    'start' => [
+                        'field' => 'prices.startDate',
+                        'type' => ApartmentFilterType::MATCH,
+                        'nested' => [
+                            'path' => 'prices',
+                            'group' => 'pricing',
+                        ],
+                    ],
+                    'priceRange' => [
+                        'field' => 'prices.price',
+                        'type' => ApartmentFilterType::RANGE,
+                        'nested' => [
+                            'path' => 'prices',
+                            'group' => 'pricing',
+                        ],
+                    ],
+                    'nights' => [
+                        'field' => 'prices.nights',
+                        'type' => ApartmentFilterType::MATCH,
+                        'nested' => [
+                            'path' => 'prices',
+                            'group' => 'pricing',
+                        ]
+                    ]
                 ],
                 [
                     'bedrooms' => [

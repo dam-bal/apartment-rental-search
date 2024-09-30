@@ -68,14 +68,31 @@ class ApartmentController extends Controller
     {
         $result = $this->apartmentSearch->search($request->all())->asArray();
 
-        $sources = array_map(static fn(array $item): array => $item['_source'], $result['hits']['hits']);
+        $results = [];
+
+        foreach ($result['hits']['hits'] as $hit) {
+            $resultItem = $hit['_source'];
+
+            foreach ($hit['inner_hits'] as $key => $innerHit) {
+                $innerHits = $innerHit['hits']['hits'];
+
+                if (count($innerHits)) {
+                    $resultItem[$key] = $innerHit['hits']['hits'][0]['_source'];
+                } else {
+                    $resultItem[$key] = null;
+                }
+            }
+
+            $results[] = $resultItem;
+        }
+
         $totalHits = $result['hits']['total']['value'];
         $pages = ceil($totalHits / $request->input('perPage', 12));
 
         return [
             'total' => $totalHits,
             'pages' => $pages,
-            'result' => $sources,
+            'result' => $results,
         ];
     }
 }
