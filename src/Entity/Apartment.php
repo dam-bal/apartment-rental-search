@@ -73,19 +73,53 @@ class Apartment
     }
 
     /**
-     * @return PriceModifier[]
-     */
-    public function getPriceModifiers(): array
-    {
-        return $this->priceModifiers;
-    }
-
-    /**
      * @return Occupancy[]
      */
     public function getOccupancies(): array
     {
         return $this->occupancies;
+    }
+
+    public function getBasePrice(DateTime $from, DateTime $to): float
+    {
+        $nights = $to->diff($from)->days;
+
+        $prices = [];
+
+        for ($i = 0; $i < $nights; $i++) {
+            $date = $from->modify(sprintf('%s days', $i));
+            $dateString = $date->format('Y-m-d');
+
+            $prices[$dateString] = $this->basePricePerNight;
+
+            foreach ($this->priceModifiers as $priceModifier) {
+                if ($date >= $priceModifier->getFrom() && $date <= $priceModifier->getTo()) {
+                    $value = 0.0;
+
+                    if ($priceModifier->getType() === PriceModifierType::AMOUNT) {
+                        $value = $priceModifier->getValue();
+                    }
+
+                    if ($priceModifier->getType() === PriceModifierType::PERCENTAGE) {
+                        $modifier = $priceModifier->getValue() / 100;
+
+                        $value = $prices[$dateString] * $modifier;
+                    }
+
+                    if ($value > 0) {
+                        $prices[$dateString] += $value;
+                    }
+                }
+            }
+        }
+
+        $total = 0;
+
+        foreach ($prices as $price) {
+            $total += $price;
+        }
+
+        return $total;
     }
 
     public function getPrice(DateTime $from, DateTime $to): float
