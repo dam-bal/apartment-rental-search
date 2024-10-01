@@ -57,12 +57,16 @@ class Search
                 continue;
             }
 
-            if ($config['nested'] ?? null) {
+            $nested = $config['nested'] ?? null;
+
+            if ($nested) {
                 $nestedFilter = $this->nestedFilters[$config['nested']['group']] ??
                     $this->createNestedFilter($query, $config);
 
                 $this->processParameter($nestedFilter, $config, $value);
-            } else {
+            }
+
+            if (!$nested) {
                 $this->processParameter($query, $config, $value);
             }
         }
