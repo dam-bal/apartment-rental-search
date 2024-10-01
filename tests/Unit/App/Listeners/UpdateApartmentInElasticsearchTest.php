@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Listeners;
+namespace Tests\Unit\App\Listeners;
 
 use App\Events\ApartmentUpdated;
+use App\Listeners\UpdateApartmentInElasticsearch;
 use App\Models\Apartment;
 use Core\Elasticsearch\Apartment\ApartmentDocument;
 use Core\Elasticsearch\Apartment\ApartmentDocumentFactory;

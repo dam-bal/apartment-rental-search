@@ -24,8 +24,8 @@ class ApartmentFilterRequest extends FormRequest
         return [
             'sort' => 'string|nullable',
             'page' => 'integer|nullable',
-            'bedrooms' => 'integer|nullable',
-            'bathrooms' => 'integer|nullable',
+            'bedrooms' => 'string|nullable',
+            'bathrooms' => 'string|nullable',
             'guests' => 'integer|nullable',
             'start' => 'date_format:Y-m-d|nullable',
             'priceRange' => 'string|nullable',

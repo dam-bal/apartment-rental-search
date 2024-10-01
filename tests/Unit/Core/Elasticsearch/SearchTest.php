@@ -1,7 +1,9 @@
 <?php
 
-namespace Core\Elasticsearch\Apartment;
+namespace Tests\Unit\Core\Elasticsearch;
 
+use Core\Elasticsearch\FilterType;
+use Core\Elasticsearch\Search;
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Generator;
 use InvalidArgumentException;
@@ -16,7 +18,7 @@ use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 use Spatie\ElasticsearchQueryBuilder\Sorts\NestedSort;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
 
-class ApartmentSearchTest extends TestCase
+class SearchTest extends TestCase
 {
     /** @var MockObject|Builder */
     private $builderMock;
@@ -26,63 +28,25 @@ class ApartmentSearchTest extends TestCase
         $this->builderMock = $this->createMock(Builder::class);
     }
 
-    public function testSearchSetsSize(): void
+    public function testSearchSetsCorrectFromAndSize(): void
     {
-        $sut = new ApartmentSearch($this->builderMock, []);
+        $search = new Search($this->builderMock);
 
         $this->builderMock
             ->expects($this->once())
             ->method('size')
-            ->with(123)
-            ->willReturnSelf();
+            ->with(10);
 
         $this->builderMock
+            ->expects($this->once())
             ->method('from')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('addQuery')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('fields')
-            ->willReturnSelf();
+            ->with(10);
 
         $this->builderMock
             ->method('search')
             ->willReturn($this->createMock(Elasticsearch::class));
 
-        $sut->search(['perPage' => 123]);
-    }
-
-    public function testSearchSetsFrom(): void
-    {
-        $sut = new ApartmentSearch($this->builderMock, []);
-
-        $this->builderMock
-            ->method('size')
-            ->with(10)
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->expects($this->once())
-            ->method('from')
-            ->with(10)
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('addQuery')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('fields')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('search')
-            ->willReturn($this->createMock(Elasticsearch::class));
-
-        $sut->search(['perPage' => 10, 'page' => 2]);
+        $search->search(page: 2, perPage: 10);
     }
 
     public static function searchSetsQueryDataProvider(): Generator
@@ -90,7 +54,7 @@ class ApartmentSearchTest extends TestCase
         yield [
             [
                 'filter' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                     'field' => 'testField',
                 ]
             ],
@@ -103,7 +67,7 @@ class ApartmentSearchTest extends TestCase
         yield [
             [
                 'filter' => [
-                    'type' => ApartmentFilterType::RANGE_MIN,
+                    'type' => FilterType::RANGE,
                     'field' => 'testField',
                 ]
             ],
@@ -116,7 +80,7 @@ class ApartmentSearchTest extends TestCase
         yield [
             [
                 'filter1' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                     'field' => 'testField.test1',
                     'nested' => [
                         'path' => 'testPath',
@@ -124,7 +88,7 @@ class ApartmentSearchTest extends TestCase
                     ]
                 ],
                 'filter2' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                     'field' => 'testField.test2',
                     'nested' => [
                         'path' => 'testPath',
@@ -149,7 +113,7 @@ class ApartmentSearchTest extends TestCase
         yield [
             [
                 'filter1' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                     'field' => 'testField.test1',
                     'nested' => [
                         'path' => 'testPath',
@@ -157,7 +121,7 @@ class ApartmentSearchTest extends TestCase
                     ]
                 ],
                 'filter2' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                     'field' => 'testField.test2',
                     'nested' => [
                         'path' => 'testPath',
@@ -188,7 +152,7 @@ class ApartmentSearchTest extends TestCase
     #[DataProvider('searchSetsQueryDataProvider')]
     public function testSearchSetsQuery(array $config, array $parameters, BoolQuery $expectedQuery): void
     {
-        $sut = new ApartmentSearch($this->builderMock, $config);
+        $sut = new Search($this->builderMock, $config);
 
         $this->builderMock
             ->method('size')
@@ -217,7 +181,7 @@ class ApartmentSearchTest extends TestCase
 
     public function testSearchSetsSort(): void
     {
-        $sut = new ApartmentSearch(
+        $sut = new Search(
             $this->builderMock,
             [],
             [
@@ -231,18 +195,6 @@ class ApartmentSearchTest extends TestCase
         );
 
         $this->builderMock
-            ->method('size')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('from')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('addQuery')
-            ->willReturnSelf();
-
-        $this->builderMock
             ->expects($this->once())
             ->method('addSort')
             ->with(
@@ -250,19 +202,15 @@ class ApartmentSearchTest extends TestCase
             );
 
         $this->builderMock
-            ->method('fields')
-            ->willReturnSelf();
-
-        $this->builderMock
             ->method('search')
             ->willReturn($this->createMock(Elasticsearch::class));
 
-        $sut->search(['sort' => 'sort1:asc']);
+        $sut->search(sort: ['sort1:asc']);
     }
 
     public function testSearchSetsNestedSort(): void
     {
-        $sut = new ApartmentSearch(
+        $sut = new Search(
             $this->builderMock,
             [],
             [
@@ -276,18 +224,6 @@ class ApartmentSearchTest extends TestCase
         );
 
         $this->builderMock
-            ->method('size')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('from')
-            ->willReturnSelf();
-
-        $this->builderMock
-            ->method('addQuery')
-            ->willReturnSelf();
-
-        $this->builderMock
             ->expects($this->once())
             ->method('addSort')
             ->with(
@@ -295,20 +231,16 @@ class ApartmentSearchTest extends TestCase
             );
 
         $this->builderMock
-            ->method('fields')
-            ->willReturnSelf();
-
-        $this->builderMock
             ->method('search')
             ->willReturn($this->createMock(Elasticsearch::class));
 
-        $sut->search(['sort' => 'sort1:asc']);
+        $sut->search(sort: ['sort' => 'sort1:asc']);
     }
 
 
     public function testSearchThrowsExceptionWhenParameterConfigDoesNotHaveType(): void
     {
-        $sut = new ApartmentSearch(
+        $sut = new Search(
             $this->builderMock,
             [
                 'filter' => [
@@ -328,11 +260,11 @@ class ApartmentSearchTest extends TestCase
 
     public function testSearchThrowsExceptionWhenParameterConfigDoesNotHaveField(): void
     {
-        $sut = new ApartmentSearch(
+        $sut = new Search(
             $this->builderMock,
             [
                 'filter' => [
-                    'type' => ApartmentFilterType::MATCH,
+                    'type' => FilterType::MATCH,
                 ]
             ]
         );

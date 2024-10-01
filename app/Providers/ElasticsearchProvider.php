@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Core\Elasticsearch\Apartment\ApartmentFilterType;
-use Core\Elasticsearch\Apartment\ApartmentSearch;
 use Core\Elasticsearch\Apartment\ApartmentsIndex;
+use Core\Elasticsearch\FilterType;
+use Core\Elasticsearch\Search;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
@@ -25,33 +25,33 @@ class ElasticsearchProvider extends ServiceProvider
             return new ApartmentsIndex($this->app->make(Client::class));
         });
 
-        $this->app->bind(ApartmentSearch::class, function () {
-            return new ApartmentSearch(
+        $this->app->bind(Search::class, function () {
+            return new Search(
                 new Builder($this->app->make(Client::class)),
                 [
                     'id' => [
                         'field' => 'id',
-                        'type' => ApartmentFilterType::MATCH,
+                        'type' => FilterType::MATCH,
                     ],
                     'bathrooms' => [
                         'field' => 'bathrooms',
-                        'type' => ApartmentFilterType::RANGE_MIN,
+                        'type' => FilterType::RANGE,
                     ],
                     'bedrooms' => [
                         'field' => 'bedrooms',
-                        'type' => ApartmentFilterType::RANGE_MIN,
+                        'type' => FilterType::RANGE,
                     ],
                     'guests' => [
                         'field' => 'guests',
-                        'type' => ApartmentFilterType::RANGE_MIN,
+                        'type' => FilterType::RANGE,
                     ],
                     'petsAllowed' => [
                         'field' => 'petsAllowed',
-                        'type' => ApartmentFilterType::MATCH,
+                        'type' => FilterType::MATCH,
                     ],
                     'start' => [
                         'field' => 'prices.startDate',
-                        'type' => ApartmentFilterType::MATCH,
+                        'type' => FilterType::MATCH,
                         'nested' => [
                             'path' => 'prices',
                             'group' => 'pricing',
@@ -59,7 +59,7 @@ class ElasticsearchProvider extends ServiceProvider
                     ],
                     'priceRange' => [
                         'field' => 'prices.price',
-                        'type' => ApartmentFilterType::RANGE,
+                        'type' => FilterType::RANGE,
                         'nested' => [
                             'path' => 'prices',
                             'group' => 'pricing',
@@ -67,7 +67,7 @@ class ElasticsearchProvider extends ServiceProvider
                     ],
                     'nights' => [
                         'field' => 'prices.nights',
-                        'type' => ApartmentFilterType::MATCH,
+                        'type' => FilterType::MATCH,
                         'nested' => [
                             'path' => 'prices',
                             'group' => 'pricing',
@@ -98,6 +98,16 @@ class ElasticsearchProvider extends ServiceProvider
                             'group' => 'pricing',
                             'mode' => 'min',
                         ],
+                    ],
+                ],
+                [
+                    'fields' => [
+                        'id',
+                        'name',
+                        'bedrooms',
+                        'bathrooms',
+                        'guests',
+                        'petsAllowed',
                     ],
                 ]
             );

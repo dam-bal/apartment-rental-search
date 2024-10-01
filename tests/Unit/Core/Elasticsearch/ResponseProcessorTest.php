@@ -1,7 +1,9 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Tests\Unit\Core\Elasticsearch;
 
+use Core\Elasticsearch\ProcessedResponse;
+use Core\Elasticsearch\ResponseProcessor;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

@@ -6,7 +6,7 @@ use App\Events\ApartmentUpdated;
 use App\Http\Requests\ApartmentFilterRequest;
 use App\Http\Requests\ApartmentPriceRequest;
 use App\Models\Apartment;
-use Core\Elasticsearch\Apartment\ApartmentSearch;
+use Core\Elasticsearch\Search;
 use Core\Elasticsearch\ResponseProcessor;
 use Eloquentity\Eloquentity;
 use Illuminate\Events\Dispatcher;
@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 class ApartmentController extends Controller
 {
     public function __construct(
-        private readonly ApartmentSearch $apartmentSearch,
+        private readonly Search $apartmentSearch,
         private readonly Dispatcher $eventDispatcher,
         private readonly Eloquentity $eloquentity,
         private readonly ResponseProcessor $apartmentSearchResultProcessor,
@@ -57,11 +57,16 @@ class ApartmentController extends Controller
 
     public function filter(ApartmentFilterRequest $request)
     {
-        $result = $this->apartmentSearch->search($request->all())->asArray();
+        $result = $this->apartmentSearch->search(
+            $request->all(),
+            $request->input('page', 1),
+            explode(',', $request->input('sort', '')),
+            $request->input('perPage', Search::PER_PAGE)
+        )->asArray();
 
         $apartmentSearchResult = $this->apartmentSearchResultProcessor->process($result);
 
-        $pages = ceil($apartmentSearchResult->total / $request->input('perPage', ApartmentSearch::PER_PAGE));
+        $pages = ceil($apartmentSearchResult->total / $request->input('perPage', Search::PER_PAGE));
 
         return [
             'total' => $apartmentSearchResult->total,

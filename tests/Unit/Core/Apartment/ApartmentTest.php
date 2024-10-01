@@ -1,8 +1,12 @@
 <?php
 
-namespace Core\Apartment;
+namespace Tests\Unit\Core\Apartment;
 
 use Carbon\Carbon;
+use Core\Apartment\Apartment;
+use Core\Apartment\ApartmentPrice;
+use Core\Apartment\PriceModifier;
+use Core\Apartment\PriceModifierType;
 use DateTime;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
