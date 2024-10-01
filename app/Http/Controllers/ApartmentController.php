@@ -7,6 +7,7 @@ use App\Http\Requests\ApartmentFilterRequest;
 use App\Http\Requests\ApartmentPriceRequest;
 use App\Models\Apartment;
 use Core\Elasticsearch\Apartment\ApartmentSearch;
+use Core\Elasticsearch\ResponseProcessor;
 use Eloquentity\Eloquentity;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
@@ -16,7 +17,8 @@ class ApartmentController extends Controller
     public function __construct(
         private readonly ApartmentSearch $apartmentSearch,
         private readonly Dispatcher $eventDispatcher,
-        private readonly Eloquentity $eloquentity
+        private readonly Eloquentity $eloquentity,
+        private readonly ResponseProcessor $apartmentSearchResultProcessor,
     ) {
     }
 
@@ -57,31 +59,14 @@ class ApartmentController extends Controller
     {
         $result = $this->apartmentSearch->search($request->all())->asArray();
 
-        $results = [];
+        $apartmentSearchResult = $this->apartmentSearchResultProcessor->process($result);
 
-        foreach ($result['hits']['hits'] as $hit) {
-            $resultItem = $hit['_source'];
-
-            foreach ($hit['inner_hits'] ?? [] as $key => $innerHit) {
-                $innerHits = $innerHit['hits']['hits'];
-
-                if (count($innerHits)) {
-                    $resultItem[$key] = $innerHit['hits']['hits'][0]['_source'];
-                } else {
-                    $resultItem[$key] = null;
-                }
-            }
-
-            $results[] = $resultItem;
-        }
-
-        $totalHits = $result['hits']['total']['value'];
-        $pages = ceil($totalHits / $request->input('perPage', ApartmentSearch::PER_PAGE));
+        $pages = ceil($apartmentSearchResult->total / $request->input('perPage', ApartmentSearch::PER_PAGE));
 
         return [
-            'total' => $totalHits,
+            'total' => $apartmentSearchResult->total,
             'pages' => $pages,
-            'result' => $results,
+            'result' => $apartmentSearchResult->results,
         ];
     }
 }
