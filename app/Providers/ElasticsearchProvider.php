@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Core\Elasticsearch\ApartmentFilterType;
-use Core\Elasticsearch\ApartmentSearch;
-use Core\Elasticsearch\ApartmentsIndex;
+use Core\Elasticsearch\Apartment\ApartmentFilterType;
+use Core\Elasticsearch\Apartment\ApartmentSearch;
+use Core\Elasticsearch\Apartment\ApartmentsIndex;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;

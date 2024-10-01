@@ -6,7 +6,7 @@ use App\Events\ApartmentUpdated;
 use App\Http\Requests\ApartmentFilterRequest;
 use App\Http\Requests\ApartmentPriceRequest;
 use App\Models\Apartment;
-use Core\Elasticsearch\ApartmentSearch;
+use Core\Elasticsearch\Apartment\ApartmentSearch;
 use Eloquentity\Eloquentity;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
@@ -40,7 +40,7 @@ class ApartmentController extends Controller
     {
         $apartment = Apartment::query()->with(['priceModifiers'])->findOrFail($id);
 
-        $entity = $this->eloquentity->map($apartment, \Core\Entity\Apartment::class);
+        $entity = $this->eloquentity->map($apartment, \Core\Apartment\Apartment::class);
 
         $price = $entity->getPrice($request->from(), $request->to());
 

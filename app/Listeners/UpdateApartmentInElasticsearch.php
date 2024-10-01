@@ -3,12 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\ApartmentUpdated;
-use Core\Elasticsearch\ApartmentDocumentFactory;
-use Core\Elasticsearch\ApartmentsIndex;
-use Core\Entity\Apartment;
+use Core\Apartment\Apartment;
+use Core\Elasticsearch\Apartment\ApartmentDocumentFactory;
+use Core\Elasticsearch\Apartment\ApartmentsIndex;
 use Eloquentity\Eloquentity;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class UpdateApartmentInElasticsearch implements ShouldQueue
 {
@@ -20,7 +19,6 @@ class UpdateApartmentInElasticsearch implements ShouldQueue
         private readonly Eloquentity $eloquentity,
         private readonly ApartmentsIndex $apartmentsIndex
     ) {
-        //
     }
 
     /**

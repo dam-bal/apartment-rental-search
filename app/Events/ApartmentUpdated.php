@@ -20,7 +20,6 @@ class ApartmentUpdated
      */
     public function __construct(public readonly Apartment $apartment)
     {
-        //
     }
 
     /**

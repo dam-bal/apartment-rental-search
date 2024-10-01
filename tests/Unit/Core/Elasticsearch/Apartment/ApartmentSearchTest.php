@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Generator;

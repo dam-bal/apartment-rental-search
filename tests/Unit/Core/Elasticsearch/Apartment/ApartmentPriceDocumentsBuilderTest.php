@@ -1,15 +1,15 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 use Carbon\Carbon;
-use Core\Entity\Apartment;
-use Core\Entity\Occupancy;
+use Core\Apartment\Apartment;
+use Core\Apartment\Occupancy;
 use DateTime;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class ApartmentPricesBuilderTest extends TestCase
+class ApartmentPriceDocumentsBuilderTest extends TestCase
 {
     public function testBuild(): void
     {
@@ -17,11 +17,11 @@ class ApartmentPricesBuilderTest extends TestCase
 
         $apartment = Mockery::mock(Apartment::class);
 
-        $sut = new ApartmentPricesBuilder(2, 1, 3);
+        $sut = new ApartmentPriceDocumentsBuilder(2, 1, 3);
 
         $apartment
             ->shouldReceive('getPrice')
-            ->andReturn(new \Core\Entity\ApartmentPrice(100.0, 100.0));
+            ->andReturn(new \Core\Apartment\ApartmentPrice(100.0, 100.0));
 
         $apartment
             ->shouldReceive('getOccupancies')
@@ -29,9 +29,9 @@ class ApartmentPricesBuilderTest extends TestCase
 
         self::assertEquals(
             [
-                new ApartmentPrice(['2024-09-30', '2024-10-01'], 1, 100.0, 100),
-                new ApartmentPrice(['2024-09-30', '2024-10-01'], 2, 100.0, 100),
-                new ApartmentPrice(['2024-09-30', '2024-10-01'], 3, 100.0, 100),
+                new ApartmentPriceDocument(['2024-09-30', '2024-10-01'], 1, 100.0, 100),
+                new ApartmentPriceDocument(['2024-09-30', '2024-10-01'], 2, 100.0, 100),
+                new ApartmentPriceDocument(['2024-09-30', '2024-10-01'], 3, 100.0, 100),
 
             ],
             $sut->build($apartment)
@@ -46,11 +46,11 @@ class ApartmentPricesBuilderTest extends TestCase
 
         $apartment = Mockery::mock(Apartment::class);
 
-        $sut = new ApartmentPricesBuilder(7, 7, 7);
+        $sut = new ApartmentPriceDocumentsBuilder(7, 7, 7);
 
         $apartment
             ->shouldReceive('getPrice')
-            ->andReturn(new \Core\Entity\ApartmentPrice(100.0, 100.0));
+            ->andReturn(new \Core\Apartment\ApartmentPrice(100.0, 100.0));
 
         $apartment
             ->shouldReceive('getOccupancies')
@@ -65,7 +65,7 @@ class ApartmentPricesBuilderTest extends TestCase
 
         self::assertEquals(
             [
-                new ApartmentPrice(
+                new ApartmentPriceDocument(
                     [
                         '2024-10-03',
                         '2024-10-04',

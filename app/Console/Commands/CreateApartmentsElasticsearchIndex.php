@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Core\Elasticsearch\ApartmentsIndex;
+use Core\Elasticsearch\Apartment\ApartmentsIndex;
 use Illuminate\Console\Command;
 
 class CreateApartmentsElasticsearchIndex extends Command
@@ -26,8 +26,10 @@ class CreateApartmentsElasticsearchIndex extends Command
      */
     public function handle(ApartmentsIndex $apartmentsIndex)
     {
-        $apartments = file_get_contents(__DIR__ . '/../../../resources/data/elasticsearch/apartments.json');
+        $apartmentsSchema = file_get_contents(
+            __DIR__ . '/../../../resources/data/elasticsearch/apartments.json'
+        );
 
-        $apartmentsIndex->create(json_decode($apartments, true));
+        $apartmentsIndex->create(json_decode($apartmentsSchema, true));
     }
 }

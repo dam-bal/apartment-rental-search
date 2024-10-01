@@ -1,12 +1,12 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 use Carbon\Carbon;
-use Core\Entity\Apartment;
-use Core\Entity\Occupancy;
+use Core\Apartment\Apartment;
+use Core\Apartment\Occupancy;
 
-class ApartmentPricesBuilder
+class ApartmentPriceDocumentsBuilder
 {
     private const DAYS = 40;
     private const MIN_NIGHTS = 1;
@@ -26,7 +26,7 @@ class ApartmentPricesBuilder
 
         $current = (clone $start);
 
-        /** @var array<string, ApartmentPrice> $prices */
+        /** @var array<string, ApartmentPriceDocument> $prices */
         $prices = [];
 
         while ($current < $endStart) {
@@ -48,7 +48,7 @@ class ApartmentPricesBuilder
                 );
 
                 if (!isset($prices[$key])) {
-                    $prices[$key] = new ApartmentPrice(
+                    $prices[$key] = new ApartmentPriceDocument(
                         [$start->format('Y-m-d')],
                         $i,
                         $price->price,

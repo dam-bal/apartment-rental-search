@@ -1,13 +1,13 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 use JsonSerializable;
 
 readonly class ApartmentDocument implements JsonSerializable
 {
     /**
-     * @param ApartmentPrice[] $prices
+     * @param ApartmentPriceDocument[] $prices
      */
     public function __construct(
         private string $id,

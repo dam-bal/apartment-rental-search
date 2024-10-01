@@ -4,9 +4,9 @@ namespace App\Listeners;
 
 use App\Events\ApartmentUpdated;
 use App\Models\Apartment;
-use Core\Elasticsearch\ApartmentDocument;
-use Core\Elasticsearch\ApartmentDocumentFactory;
-use Core\Elasticsearch\ApartmentsIndex;
+use Core\Elasticsearch\Apartment\ApartmentDocument;
+use Core\Elasticsearch\Apartment\ApartmentDocumentFactory;
+use Core\Elasticsearch\Apartment\ApartmentsIndex;
 use Eloquentity\Eloquentity;
 use Tests\TestCase;
 
@@ -28,7 +28,7 @@ class UpdateApartmentInElasticsearchTest extends TestCase
 
         $event = new ApartmentUpdated($this->createMock(Apartment::class));
 
-        $entityMock = $this->createMock(\Core\Entity\Apartment::class);
+        $entityMock = $this->createMock(\Core\Apartment\Apartment::class);
 
         $entityMock
             ->method('getId')

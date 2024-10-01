@@ -1,13 +1,12 @@
 <?php
 
-namespace Core\Entity;
+namespace Core\Apartment;
 
 use Carbon\Carbon;
-use Core\Enum\PriceModifierType;
 
 class Apartment
 {
-    private const LOWEST_PRICE = 15.0;
+    private const LOWEST_PRICE_PER_NIGHT = 15.0;
 
     /**
      * @param Occupancy[] $occupancies
@@ -116,14 +115,11 @@ class Apartment
 
         $priceTotal = 0;
         foreach ($prices as $price) {
-            $priceTotal += $price;
+            $priceTotal += max($price, self::LOWEST_PRICE_PER_NIGHT);
         }
 
-        $basePriceTotal = 0;
-        foreach ($basePrices as $price) {
-            $basePriceTotal += $price;
-        }
+        $basePriceTotal = array_sum(array_values($basePrices));
 
-        return new ApartmentPrice($basePriceTotal, max($priceTotal, self::LOWEST_PRICE));
+        return new ApartmentPrice($basePriceTotal, $priceTotal);
     }
 }

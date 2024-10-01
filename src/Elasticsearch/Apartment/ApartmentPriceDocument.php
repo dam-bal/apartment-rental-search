@@ -1,8 +1,10 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
-class ApartmentPrice implements \JsonSerializable
+use JsonSerializable;
+
+class ApartmentPriceDocument implements JsonSerializable
 {
     /**
      * @param string[] $startDates
@@ -20,7 +22,7 @@ class ApartmentPrice implements \JsonSerializable
         $this->startDates[] = $date;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return [
             'startDate' => $this->startDates,

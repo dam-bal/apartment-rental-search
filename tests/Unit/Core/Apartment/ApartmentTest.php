@@ -1,9 +1,8 @@
 <?php
 
-namespace Core\Entity;
+namespace Core\Apartment;
 
 use Carbon\Carbon;
-use Core\Enum\PriceModifierType;
 use DateTime;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;

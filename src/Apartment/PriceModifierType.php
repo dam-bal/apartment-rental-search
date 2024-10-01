@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Enum;
+namespace Core\Apartment;
 
 enum PriceModifierType: string
 {

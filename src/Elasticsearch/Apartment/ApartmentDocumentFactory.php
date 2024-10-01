@@ -1,12 +1,12 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
-use Core\Entity\Apartment;
+use Core\Apartment\Apartment;
 
-class ApartmentDocumentFactory
+readonly class ApartmentDocumentFactory
 {
-    public function __construct(private readonly ApartmentPricesBuilder $apartmentPricesBuilder)
+    public function __construct(private ApartmentPriceDocumentsBuilder $apartmentPricesBuilder)
     {
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 enum ApartmentFilterType: string
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use InvalidArgumentException;
@@ -11,12 +11,13 @@ use Spatie\ElasticsearchQueryBuilder\Queries\RangeQuery;
 use Spatie\ElasticsearchQueryBuilder\Queries\TermQuery;
 use Spatie\ElasticsearchQueryBuilder\Sorts\NestedSort;
 use Spatie\ElasticsearchQueryBuilder\Sorts\Sort;
+use Spatie\ElasticsearchQueryBuilder\Sorts\Sorting;
 
 class ApartmentSearch
 {
     private const PAGE = 1;
     private const PER_PAGE = 12;
-    private const SORT_DEFAULT_ORDER = Sort::ASC;
+    private const SORT_DEFAULT_ORDER = Sorting::ASC;
     private const FIELDS = [
         'bedrooms',
         'bathrooms',
@@ -56,21 +57,7 @@ class ApartmentSearch
             }
 
             if ($config['nested'] ?? null) {
-                $nestedFilter = $this->nestedFilters[$config['nested']['group']] ?? null;
-
-                if (!$nestedFilter) {
-                    $nestedFilter = new BoolQuery();
-
-                    $this->nestedFilters[$config['nested']['group']] = $nestedFilter;
-
-                    $nestedQuery = new NestedQuery($config['nested']['path'], $nestedFilter);
-
-                    $nestedQuery->innerHits(NestedQuery\InnerHits::create($config['nested']['group'])->size(1));
-
-                    $query->add($nestedQuery, 'filter');
-                }
-
-                $this->process($nestedFilter, $config, $value);
+                $this->processNested($query, $config, $value);
             } else {
                 $this->process($query, $config, $value);
             }
@@ -91,6 +78,32 @@ class ApartmentSearch
             ->size($perPage)
             ->fields(array_values(array_unique($fields)))
             ->search();
+    }
+
+    private function processNested(BoolQuery $query, array $config, mixed $value): void
+    {
+        $nestedFilter = $this->nestedFilters[$config['nested']['group']] ?? null;
+
+        if (!$nestedFilter) {
+            $nestedFilter = $this->createNestedFilter($query, $config);
+        }
+
+        $this->process($nestedFilter, $config, $value);
+    }
+
+    private function createNestedFilter(BoolQuery $query, array $config): BoolQuery
+    {
+        $nestedFilter = new BoolQuery();
+
+        $this->nestedFilters[$config['nested']['group']] = $nestedFilter;
+
+        $nestedQuery = new NestedQuery($config['nested']['path'], $nestedFilter);
+
+        $nestedQuery->innerHits(NestedQuery\InnerHits::create($config['nested']['group'])->size(1));
+
+        $query->add($nestedQuery, 'filter');
+
+        return $nestedFilter;
     }
 
     private function processSort(string $sort): void
@@ -115,23 +128,28 @@ class ApartmentSearch
             $isNested = $config['nested'] ?? null;
 
             if ($isNested) {
-                $nestedSort = NestedSort::create($config['nested']['path'], $field, $order);
-
-                $nestedSort->maxChildren(1);
-
-                if (($config['nested']['group'] ?? null) && $this->nestedFilters[$config['nested']['group']] ?? null) {
-                    $nestedSort->filter($this->nestedFilters[$config['nested']['group']]);
-                }
-
-                if ($config['nested']['mode'] ?? null) {
-                    $nestedSort->mode($config['nested']['mode']);
-                }
-
-                $this->builder->addSort($nestedSort);
+                $this->processNestedSort($field, $config, $order);
             } else {
                 $this->builder->addSort(Sort::create($field, $order));
             }
         }
+    }
+
+    private function processNestedSort(string $field, array $config, string $order): void
+    {
+        $nestedSort = NestedSort::create($config['nested']['path'], $field, $order);
+
+        $nestedSort->maxChildren(1);
+
+        if (($config['nested']['group'] ?? null) && $this->nestedFilters[$config['nested']['group']] ?? null) {
+            $nestedSort->filter($this->nestedFilters[$config['nested']['group']]);
+        }
+
+        if ($config['nested']['mode'] ?? null) {
+            $nestedSort->mode($config['nested']['mode']);
+        }
+
+        $this->builder->addSort($nestedSort);
     }
 
     private function process(BoolQuery $query, array $config, mixed $value): void

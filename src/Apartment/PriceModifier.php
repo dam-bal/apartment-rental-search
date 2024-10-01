@@ -1,8 +1,7 @@
 <?php
 
-namespace Core\Entity;
+namespace Core\Apartment;
 
-use Core\Enum\PriceModifierType;
 use DateTime;
 
 class PriceModifier

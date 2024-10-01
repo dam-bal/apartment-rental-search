@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Entity;
+namespace Core\Apartment;
 
 readonly class ApartmentPrice
 {

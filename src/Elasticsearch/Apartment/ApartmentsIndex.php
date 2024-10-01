@@ -1,7 +1,8 @@
 <?php
 
-namespace Core\Elasticsearch;
+namespace Core\Elasticsearch\Apartment;
 
+use Core\Elasticsearch\Index;
 use Elastic\Elasticsearch\Client;
 
 class ApartmentsIndex extends Index

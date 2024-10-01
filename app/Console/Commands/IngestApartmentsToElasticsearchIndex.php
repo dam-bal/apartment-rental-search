@@ -9,6 +9,8 @@ use Illuminate\Events\Dispatcher;
 
 class IngestApartmentsToElasticsearchIndex extends Command
 {
+    private const BATCH_SIZE = 50;
+
     /**
      * The name and signature of the console command.
      *
@@ -28,7 +30,7 @@ class IngestApartmentsToElasticsearchIndex extends Command
      */
     public function handle(Dispatcher $eventDispatcher)
     {
-        Apartment::query()->with(['priceModifiers'])->chunk(50, function ($apartments) use (
+        Apartment::query()->with(['priceModifiers'])->chunk(self::BATCH_SIZE, function (array $apartments) use (
             $eventDispatcher
         ) {
             foreach ($apartments as $apartment) {
