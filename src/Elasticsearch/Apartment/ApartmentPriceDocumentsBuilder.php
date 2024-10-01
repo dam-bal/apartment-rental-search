@@ -71,19 +71,11 @@ class ApartmentPriceDocumentsBuilder
     private function isOccupied(array $occupancies, Carbon $start, Carbon $end): bool
     {
         foreach ($occupancies as $occupancy) {
-            $from = Carbon::instance($occupancy->from)->setTime(14, 0);
-            $to = Carbon::instance($occupancy->to)->setTime(12, 0);
-
-            if ($this->isOverlapping($from, $to, $start, $end)) {
+            if ($occupancy->isOverlapping($start, $end)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    private function isOverlapping(Carbon $start1, Carbon $end1, Carbon $start2, Carbon $end2): bool
-    {
-        return ($start1 <= $end2) && ($start2 <= $end1);
     }
 }
