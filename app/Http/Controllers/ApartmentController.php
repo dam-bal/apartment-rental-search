@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Events\ApartmentUpdated;
+use App\Http\Requests\ApartmentFilterRequest;
+use App\Http\Requests\ApartmentPriceRequest;
 use App\Models\Apartment;
-use Carbon\Carbon;
 use Core\Elasticsearch\ApartmentSearch;
 use Eloquentity\Eloquentity;
 use Illuminate\Events\Dispatcher;
@@ -17,11 +18,6 @@ class ApartmentController extends Controller
         private readonly Dispatcher $eventDispatcher,
         private readonly Eloquentity $eloquentity
     ) {
-    }
-
-    public function index()
-    {
-        return Apartment::query()->paginate(10);
     }
 
     public function show(string $id)
@@ -40,31 +36,24 @@ class ApartmentController extends Controller
         return $apartment;
     }
 
-    public function price(string $id, Request $request)
+    public function price(string $id, ApartmentPriceRequest $request)
     {
-        $from = $request->get('from');
-        $to = $request->get('to');
-
-        $from = Carbon::createFromFormat('Y-m-d', $from);
-        $to = Carbon::createFromFormat('Y-m-d', $to);
-
         $apartment = Apartment::query()->with(['priceModifiers'])->findOrFail($id);
 
         $entity = $this->eloquentity->map($apartment, \Core\Entity\Apartment::class);
 
-        $price = $entity->getPrice($from, $to);
+        $price = $entity->getPrice($request->from(), $request->to());
 
         return [
-            'basePricePerNight' => $apartment->base_price_per_night,
-            'from' => $from->format('Y-m-d'),
-            'to' => $to->format('Y-m-d'),
-            'nights' => $to->diffInDays($from, true),
+            'from' => $request->input('from'),
+            'to' => $request->input('to'),
+            'nights' => $request->to()->diffInDays($request->from(), true),
             'price' => $price->price,
-            'basePrice' => $price->basePrice
+            'basePrice' => $price->basePrice,
         ];
     }
 
-    public function filter(Request $request)
+    public function filter(ApartmentFilterRequest $request)
     {
         $result = $this->apartmentSearch->search($request->all())->asArray();
 
