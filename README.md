@@ -2,6 +2,8 @@
 
 Apartment Rental Search with Elasticsearch
 
+Each apartment is defined by a set of attributes, such as the number of bedrooms, bathrooms, and other features. It also has a base nightly price, which can be adjusted by applying price modifiers, either as a fixed amount or a percentage. All prices are indexed in Elasticsearch for each apartment, allowing efficient filtering based on criteria such as price range, number of nights, and start date. Occupied dates are automatically excluded from the pricing data, so there's no need for additional availability filters, price checks inherently account for availability. Price sorting functionality also works seamlessly with all applied price filters.
+
 [Front-end app repository](https://github.com/dam-bal/apartment-rental-search-app)
 
 ## Tech used
