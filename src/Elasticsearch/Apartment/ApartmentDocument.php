@@ -27,7 +27,7 @@ readonly class ApartmentDocument implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'name' => ucfirst($this->name) . ' Apartment',
+            'name' => $this->name,
             'bedrooms' => $this->bedrooms,
             'bathrooms' => $this->bathrooms,
             'guests' => $this->guests,

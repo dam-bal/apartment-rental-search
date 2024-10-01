@@ -96,19 +96,23 @@ class Apartment
             $basePrices[$dateString] = $this->basePricePerNight;
 
             foreach ($this->priceModifiers as $priceModifier) {
-                if ($date >= $priceModifier->getFrom()->setTime(0, 0)
-                    && $date <= $priceModifier->getTo()->setTime(0, 0)
+                if (
+                    !($date >= $priceModifier->getFrom()->setTime(0, 0)
+                        && $date <= $priceModifier->getTo()->setTime(23, 59)
+                    )
                 ) {
-                    $value = match ($priceModifier->getType()) {
-                        PriceModifierType::AMOUNT => $priceModifier->getValue(),
-                        PriceModifierType::PERCENTAGE => $this->basePricePerNight * ($priceModifier->getValue() / 100),
-                    };
+                    continue;
+                }
 
-                    $prices[$dateString] += $value;
+                $value = match ($priceModifier->getType()) {
+                    PriceModifierType::AMOUNT => $priceModifier->getValue(),
+                    PriceModifierType::PERCENTAGE => $this->basePricePerNight * ($priceModifier->getValue() / 100),
+                };
 
-                    if ($value > 0) {
-                        $basePrices[$dateString] += $value;
-                    }
+                $prices[$dateString] += $value;
+
+                if ($value > 0) {
+                    $basePrices[$dateString] += $value;
                 }
             }
         }
@@ -118,8 +122,6 @@ class Apartment
             $priceTotal += max($price, self::LOWEST_PRICE_PER_NIGHT);
         }
 
-        $basePriceTotal = array_sum(array_values($basePrices));
-
-        return new ApartmentPrice($basePriceTotal, $priceTotal);
+        return new ApartmentPrice(array_sum(array_values($basePrices)), $priceTotal);
     }
 }

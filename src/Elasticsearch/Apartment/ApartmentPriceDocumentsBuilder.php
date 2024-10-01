@@ -49,14 +49,14 @@ class ApartmentPriceDocumentsBuilder
 
                 if (!isset($prices[$key])) {
                     $prices[$key] = new ApartmentPriceDocument(
-                        [$start->format('Y-m-d')],
+                        [],
                         $i,
                         $price->price,
                         $price->basePrice
                     );
-                } else {
-                    $prices[$key]->addStartDate($start->format('Y-m-d'));
                 }
+
+                $prices[$key]->addStartDate($start->format('Y-m-d'));
             }
 
             $current->addDay();

@@ -25,7 +25,7 @@ class ApartmentPriceDocument implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'startDate' => $this->startDates,
+            'startDate' => array_values(array_unique($this->startDates)),
             'nights' => $this->nights,
             'price' => $this->price,
             'basePrice' => $this->basePrice,

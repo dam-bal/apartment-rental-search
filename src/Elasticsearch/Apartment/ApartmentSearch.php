@@ -15,8 +15,8 @@ use Spatie\ElasticsearchQueryBuilder\Sorts\Sorting;
 
 class ApartmentSearch
 {
+    public const PER_PAGE = 12;
     private const PAGE = 1;
-    private const PER_PAGE = 12;
     private const SORT_DEFAULT_ORDER = Sorting::ASC;
     private const FIELDS = [
         'bedrooms',

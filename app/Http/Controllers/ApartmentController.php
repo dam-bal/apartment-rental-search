@@ -76,7 +76,7 @@ class ApartmentController extends Controller
         }
 
         $totalHits = $result['hits']['total']['value'];
-        $pages = ceil($totalHits / $request->input('perPage', 12));
+        $pages = ceil($totalHits / $request->input('perPage', ApartmentSearch::PER_PAGE));
 
         return [
             'total' => $totalHits,
