@@ -121,22 +121,19 @@ class Search
             $key = $sortValues[0];
 
             $config = $this->sortConfig[$key] ?? null;
-
             if (!$config) {
                 return;
             }
 
             $order = $sortValues[1] ?? $config['order'] ?? self::SORT_DEFAULT_ORDER;
-
             $field = $config['field'];
 
-            $isNested = $config['nested'] ?? null;
-
-            if ($isNested) {
+            $nested = $config['nested'] ?? null;
+            if ($nested) {
                 $this->processNestedSort($field, $config, $order);
             }
 
-            if (!$isNested) {
+            if (!$nested) {
                 $this->builder->addSort(Sort::create($field, $order));
             }
         }
@@ -149,7 +146,7 @@ class Search
 
         $nestedSort = NestedSort::create($nestedConfig['path'], $field, $order);
 
-        $nestedSort->maxChildren(1);
+        $nestedSort->maxChildren($nestedConfig['maxChildren'] ?? 1);
 
         if ($group && $this->nestedFilters[$group] ?? null) {
             $nestedSort->filter($this->nestedFilters[$group]);
@@ -173,9 +170,12 @@ class Search
 
         $nestedQuery = new NestedQuery($nestedConfig['path'], $nestedFilter);
 
-        $nestedQuery->innerHits(NestedQuery\InnerHits::create($group)->size(1));
+        $nestedQuery
+            ->innerHits(NestedQuery\InnerHits::create($group)
+                ->size($this->config['innerHits'][$group]['size'] ?? 1)
+            );
 
-        $query->add($nestedQuery, 'filter');
+        $query->add($nestedQuery, $this->config['innerHits'][$group]['queryType'] ?? 'filter');
 
         return $nestedFilter;
     }
