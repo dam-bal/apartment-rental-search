@@ -2,6 +2,8 @@
 
 Apartment Rental Search with Elasticsearch
 
+[Front-end app repository](https://github.com/dam-bal/apartment-rental-search-app)
+
 ## Installation
 
 ### Install Dependencies
