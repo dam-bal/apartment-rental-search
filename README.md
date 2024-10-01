@@ -4,6 +4,13 @@ Apartment Rental Search with Elasticsearch
 
 [Front-end app repository](https://github.com/dam-bal/apartment-rental-search-app)
 
+## Tech used
+* Elasticsearch
+* Laravel
+* [https://github.com/dam-bal/eloquentity](https://github.com/dam-bal/eloquentity) - used to map eloquent models to entities
+* [https://github.com/dam-bal/elasticsearch-query-builder)](https://github.com/dam-bal/elasticsearch-query-builder) - used to build elasticsearch query
+* [https://github.com/elastic/elasticsearch-php](https://github.com/elastic/elasticsearch-php)
+
 ## Installation
 
 ### Install Dependencies
