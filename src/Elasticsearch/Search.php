@@ -148,7 +148,7 @@ class Search
 
         $nestedSort->maxChildren($nestedConfig['maxChildren'] ?? 1);
 
-        if ($group && $this->nestedFilters[$group] ?? null) {
+        if ($group && isset($this->nestedFilters[$group])) {
             $nestedSort->filter($this->nestedFilters[$group]);
         }
 
